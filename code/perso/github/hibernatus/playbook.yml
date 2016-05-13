@@ -1,8 +1,0 @@
----
-- name: Install hibernatus dependencies
-  hosts: localhost
-  gather_facts: true
-  roles:
-   - role: geerlingguy.git
-   # - role: angstwad.docker_ubuntu
-
