@@ -1,5 +1,3 @@
 # hibernatus
 
-```
-git clone --recursive https://github.com/francisoud/hibernatus.git
-```
+Install and script to setup base tool for hibernatus
