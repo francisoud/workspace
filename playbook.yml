@@ -1,0 +1,35 @@
+---
+- name: checkout
+  hosts: localhost
+
+  pre_tasks:
+    - name: Install roles from Ansible Galaxy
+      become: true
+      shell: ansible-galaxy install -r requirements.yml
+    - name: Store passphrase
+      shell: ssh-add ~/.ssh/github/id_rsa-private-key-ssh2-rsa
+
+  roles:
+   - name: cmod-migration
+     role: cchurch.scm
+     scm_url: git@github.com:francisoud/cmod-migration.git
+     scm_target_user: francisoud
+     scm_target_path: ./code/perso/github/cmod-migration
+     scm_version: master
+   - name: googlecalendar
+     role: cchurch.scm
+     scm_url: git@github.com:francisoud/googlecalendar.git
+     scm_target_user: francisoud
+     scm_target_path: ./code/perso/github/googlecalendar
+     som_version: master
+   - role: cchurch.scm
+     scm_url: git@github.com:francisoud/android-transfer.git
+     scm_target_user: francisoud
+     scm_target_path: ./code/perso/github/android-transfer
+     scm_version: master
+   - role: cchurch.scm
+     scm_url: git@github.com:francisoud/francisoud-sandbox.git
+     scm_target_user: francisoud
+     scm_target_path: ./code/perso/github/francisoud-sandbox
+     scm_version: master
+

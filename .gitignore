@@ -1,1 +1,2 @@
-code/perso/github/hibernatus
+code/perso/github/*/
+playbook.retry
