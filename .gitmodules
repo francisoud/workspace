@@ -1,6 +1,0 @@
-[submodule "hibernatus-ansible"]
-	path = hibernatus-ansible
-	url = git@github.com:francisoud/hibernatus-ansible.git
-[submodule "hibernatus-core"]
-	path = hibernatus-core
-	url = git@github.com:francisoud/hibernatus-core.git
