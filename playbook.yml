@@ -2,8 +2,8 @@
 - name: checkout
   hosts: localhost
   vars:
-    # git_protocol: git@github.com:
-    git_protocol: https://github.com/
+    git_protocol: "git@github.com:"
+    # git_protocol: https://github.com/
     veracrypt_download_url: https://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=veracrypt&DownloadId=1537179&FileTime=130999181365600000&Build=21031
 
   pre_tasks:
@@ -22,28 +22,28 @@
       shell: tar xvfj /tmp/veracrypt-1.17-setup.tar.bz2 -C /tmp
       tags: veracrypt
     - name: install veracrypt linux v1.17
-      shell: /tmp/veracrypt-1.17-console-gui-x64
+      shell: /tmp/veracrypt-1.17-setup-console-x64
       tags: veracrypt
-    - shell: rm -fr /tmp/veracrypt*
+    - file: path=/tmp/veracrypt* state=absent
       tags: veracrypt
 
   roles:
    - name: cmod-migration
      role: cchurch.scm
-     scm_url: "{{ git_protocol }}francisoud/cmod-migration.git"
+     scm_url: "{{git_protocol}}francisoud/cmod-migration.git"
      scm_target_path: ./code/perso/github/cmod-migration
      scm_version: master
    - name: googlecalendar
      role: cchurch.scm
-     scm_url: "{{ git_protocol }}francisoud/googlecalendar.git"
+     scm_url: "{{git_protocol}}francisoud/googlecalendar.git"
      scm_target_path: ./code/perso/github/googlecalendar
      som_version: master
    - role: cchurch.scm
-     scm_url: "{{ git_protocol }}francisoud/android-transfer.git"
+     scm_url: "{{git_protocol}}francisoud/android-transfer.git"
      scm_target_path: ./code/perso/github/android-transfer
      scm_version: master
    - role: cchurch.scm
-     scm_url: "{{ git_protocol }}francisoud/francisoud-sandbox.git"
+     scm_url: "{{git_protocol}}francisoud/francisoud-sandbox.git"
      scm_target_path: ./code/perso/github/francisoud-sandbox
      scm_version: master
 
