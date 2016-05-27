@@ -4,6 +4,7 @@
   vars:
     # git_protocol: git@github.com:
     git_protocol: https://github.com/
+    veracrypt_download_url: https://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=veracrypt&DownloadId=1537179&FileTime=130999181365600000&Build=21031
 
   pre_tasks:
     - name: Install roles from Ansible Galaxy
@@ -12,6 +13,19 @@
     - name: Store passphrase
       shell: ssh-add ~/.ssh/github/id_rsa-private-key-ssh2-rsa
       ignore_errors: yes
+
+  tasks:
+    - name: download veracrypt linux v1.17
+      get_url: url={{veracrypt_download_url}} dest=/tmp/veracrypt-1.17-setup.tar.bz2 checksum=sha256:5b4e7eb9d327d62f1f49cef92f534fbc5e08cb252b2912c8e223efab6e0b128f
+      tags: veracrypt
+    - name: unarchive veracrypt
+      shell: tar xvfj /tmp/veracrypt-1.17-setup.tar.bz2 -C /tmp
+      tags: veracrypt
+    - name: install veracrypt linux v1.17
+      shell: /tmp/veracrypt-1.17-console-gui-x64
+      tags: veracrypt
+    - shell: rm -fr /tmp/veracrypt*
+      tags: veracrypt
 
   roles:
    - name: cmod-migration
@@ -32,6 +46,4 @@
      scm_url: "{{ git_protocol }}francisoud/francisoud-sandbox.git"
      scm_target_path: ./code/perso/github/francisoud-sandbox
      scm_version: master
-   - role: kbrebanov.subversion
-     become: true
 
