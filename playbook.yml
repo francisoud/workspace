@@ -2,48 +2,70 @@
 - name: checkout
   hosts: localhost
   vars:
-    git_protocol: "git@github.com:"
-    # git_protocol: https://github.com/
     veracrypt_download_url: https://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=veracrypt&DownloadId=1537179&FileTime=130999181365600000&Build=21031
 
-  pre_tasks:
-    - name: Install roles from Ansible Galaxy
-      become: true
-      shell: ansible-galaxy install -r requirements.yml
-    - name: Store passphrase
-      shell: ssh-add ~/.ssh/github/id_rsa-private-key-ssh2-rsa
-      ignore_errors: yes
-
   tasks:
+    - git_config: name=alias.co scope=global value=checkout
+      tags: git_config
+    - git_config: name=alias.ci scope=global value=commit
+      tags: git_config
+    - git_config: name=alias.st scope=global value=status
+      tags: git_config
+    - git_config: name=alias.br scope=global value=branch
+      tags: git_config
+    - name: install ubuntu desktop indicator-multiload
+      become: true
+      apt: name=indicator-multiload state=present
+    # Install veracypt
+    - stat: path=/usr/bin/veracrypt
+      register: veracrypt_installed
     - name: download veracrypt linux v1.17
       get_url: url={{veracrypt_download_url}} dest=/tmp/veracrypt-1.17-setup.tar.bz2 checksum=sha256:5b4e7eb9d327d62f1f49cef92f534fbc5e08cb252b2912c8e223efab6e0b128f
+      when: veracrypt_installed.stat.exists is not defined
       tags: veracrypt
     - name: unarchive veracrypt
       shell: tar xvfj /tmp/veracrypt-1.17-setup.tar.bz2 -C /tmp
+      when: veracrypt_installed.stat.exists is not defined
       tags: veracrypt
     - name: install veracrypt linux v1.17
       shell: /tmp/veracrypt-1.17-setup-console-x64
+      when: veracrypt_installed.stat.exists is not defined
       tags: veracrypt
     - file: path=/tmp/veracrypt* state=absent
+      when: veracrypt_installed.stat.exists is not defined
       tags: veracrypt
 
-  roles:
-   - name: cmod-migration
-     role: cchurch.scm
-     scm_url: "{{git_protocol}}francisoud/cmod-migration.git"
-     scm_target_path: ./code/perso/github/cmod-migration
-     scm_version: master
-   - name: googlecalendar
-     role: cchurch.scm
-     scm_url: "{{git_protocol}}francisoud/googlecalendar.git"
-     scm_target_path: ./code/perso/github/googlecalendar
-     som_version: master
-   - role: cchurch.scm
-     scm_url: "{{git_protocol}}francisoud/android-transfer.git"
-     scm_target_path: ./code/perso/github/android-transfer
-     scm_version: master
-   - role: cchurch.scm
-     scm_url: "{{git_protocol}}francisoud/francisoud-sandbox.git"
-     scm_target_path: ./code/perso/github/francisoud-sandbox
-     scm_version: master
+    # Install Oracle Java 8
+    - name: Install add-apt-repostory
+      become: true
+      apt: name=software-properties-common state=latest
+    - name: Add Oracle Java Repository
+      become: true
+      apt_repository: repo='ppa:webupd8team/java'
+    - name: Accept Java 8 License
+      become: true
+      debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+    - name: Install Oracle Java 8
+      become: true
+      apt: name={{item}} state=latest
+      with_items:
+        - oracle-java8-installer
+        - ca-certificates
+        - oracle-java8-set-default
 
+    # Checkout Github projects
+    - name: git clone cmod-migration
+      git: repo="git@github.com:francisoud/cmod-migration.git" dest=code/perso/github/cmod-migration 
+      tags: github
+    - name: git clone googlecalendar
+      git: repo="git@github.com:francisoud/googlecalendar.git" dest=code/perso/github/googlecalendar
+      tags: github
+    - name: git clone android-transfer
+      git: repo="git@github.com:francisoud/android-transfer.git" dest=code/perso/github/android-transfer
+      tags: github
+    - name: git clone francisoud-sandbox
+      git: repo="git@github.com:francisoud/francisoud-sandbox.git" dest=code/perso/github/francisoud-sandbox
+      tags: github
+
+    - include: gfi.yml
+      when: gfi_pwd is defined

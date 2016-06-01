@@ -1,0 +1,26 @@
+---
+- name: gfi
+  hosts: localhost
+  vars:
+
+  roles:
+   - role: cchurch.scm
+     scm_type: svn
+     scm_url: "http://frtlsvsv001/svn/GFI_GFI_GComp"
+     scm_target_path: ./code/gfi/internal/gcomp
+     scm_username: frup68971
+     scm_password: {{gfi_pwd}}
+
+  tasks:
+    - name: archi - mount samba
+      shell: mount -t cifs -o frup68971,{{gfi_pwd}} smb://odin/projets/ARCHITECTURE /mnt/gfi.archi/
+      tags: gfi
+    - name: gcomp - mount samba
+      shell: mount -t cifs -o frup68971,{{gfi_pwd}} //odin/projets/fops/gcomp /mnt/gfi.gcomp/
+      tags: gfi
+    - name: gcomp - svn checkout
+      shell: svn checkout http//frtlsvsv001/svn/GFI_GFI_GComp code/gfi/gcomp
+      tags: gfi
+    - name: copy docker proxy conf
+      copy: src=infrastructure/gfi/etc/systemd/system/docker.service.d/http-proxy.conf dest=/etc/systemd/system/docker.service.d/http-proxy.conf
+
